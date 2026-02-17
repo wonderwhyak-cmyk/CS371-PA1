@@ -264,6 +264,16 @@ void run_client() {
     for (int i = 0; i < num_client_threads; i++) {
         pthread_join(threads[i], NULL);
 
+        /* Per-thread stats required by the PA */
+        long long thread_avg_rtt = 0;
+        if (thread_data[i].total_messages > 0) {
+            thread_avg_rtt = thread_data[i].total_rtt / thread_data[i].total_messages;
+        }
+
+        printf("Thread %d Average RTT: %lld us\n", i, thread_avg_rtt);
+        printf("Thread %d Request Rate: %f messages/s\n", i, thread_data[i].request_rate);
+
+        /* Aggregate overall stats */
         total_rtt += thread_data[i].total_rtt;
         total_messages += thread_data[i].total_messages;
         total_request_rate += thread_data[i].request_rate;
